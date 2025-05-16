@@ -1,11 +1,10 @@
 <script setup>
   import CommandeView from './components/CommandeView.vue';
-import TableView from './components/TableView.vue';
+import SalleView from './components/SalleView.vue';
 </script>
 
 <template>
-  <TableView />
-  <CommandeView />
+  <SalleView />
 </template>
 
 <style scoped>
