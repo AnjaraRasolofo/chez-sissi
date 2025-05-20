@@ -1,62 +1,75 @@
 <template>
-  <div class="p-6">
-    <h1 class="text-2xl font-bold mb-6">Plan de salle du restaurant</h1>
+  <div class="container-fluid">
+    <h1 class="text-center my-4 display-4">CHEZ SISSI</h1>
+    <div class="row">
+      <!-- Salle -->
+      <div class="col-md-9 d-flex flex-wrap justify-content-start position-relative">
+        <!-- Exemple Table -->
+        <div
+          v-for="n in 7"
+          :key="n"
+          class="table-container m-2"
+          :class="{ 'round': n === 1 || n === 4 || n === 7, 'square': n === 2 || n === 3, 'rectangle': n === 5 || n === 6 }"
+          @click="redirectToOrder(n)"
+        >
+          <div class="table d-flex align-items-center justify-content-center">{{ n }}</div>
+          <div class="seat top-chair"></div>
+          <div class="seat bottom-chair"></div>
+          <div class="seat left-chair"></div>
+          <div class="seat right-chair"></div>
+        </div>
 
-    <div class="flex gap-10">
-      <!-- Colonne 1 : Rectangles -->
-      <div class="w-1/2">
-        <h2 class="text-xl font-semibold mb-4 text-center">Tables Rectangles</h2>
-        <div class="grid grid-cols-2 gap-6 justify-items-center">
-          <div
-            v-for="table in rectangleTables"
-            :key="table.id"
-            class="table-container"
-          >
-            <div class="chair top-chair"></div>
-            <div class="chair right-chair"></div>
-            <div class="chair bottom-chair"></div>
-            <div class="chair left-chair"></div>
-
-            <div
-              class="table flex items-center justify-center text-white font-semibold cursor-pointer rectangle"
-              :style="{ backgroundColor: getColor(table.status) }"
-              @click="toggleTableStatus(table.id)"
-            >
-              Table {{ table.number }}
-            </div>
+        <!-- Comptoir -->
+        <div class="table-container m-2" @click="showCommands()">
+          <div class="table bg-secondary text-white d-flex align-items-center justify-content-center">
+            Comptoir
           </div>
         </div>
+
+        <!-- Plantes et autres éléments décoratifs -->
+        <div class="plant plant1"></div>
+        <div class="door">Porte</div>
       </div>
 
-      <!-- Colonne 2 : Rondes -->
-      <div class="w-1/2">
-        <h2 class="text-xl font-semibold mb-4 text-center">Tables Rondes</h2>
-        <div class="grid grid-cols-2 gap-6 justify-items-center">
-          <div
-            v-for="table in roundTables"
-            :key="table.id"
-            class="table-container"
-          >
-            <div class="chair top-chair"></div>
-            <div class="chair right-chair"></div>
-            <div class="chair bottom-chair"></div>
-            <div class="chair left-chair"></div>
+      <!-- Sidebar -->
+      <div class="col-md-3">
+        <div v-if="commands" class="border rounded p-3 mb-3 bg-light">
+          <h3>Commandes</h3>
+          <ul class="list-unstyled">
+            <li v-for="n in 7" :key="n">Table {{ n }} : 0</li>
+            <hr />
+            <li><strong>Total : 0 €</strong></li>
+          </ul>
+        </div>
 
-            <div
-              class="table flex items-center justify-center text-white font-semibold cursor-pointer rond"
-              :style="{ backgroundColor: getColor(table.status) }"
-              @click="toggleTableStatus(table.id)"
+        <div v-if="showPlats" class="menu p-3 bg-white border rounded">
+          <h4>Table {{ selectedTable }} - Commande</h4>
+          <ul class="list-group mb-3">
+            <li
+              v-for="plat in plats"
+              :key="plat.id"
+              class="list-group-item d-flex justify-content-between align-items-center"
             >
-              Table {{ table.number }}
-            </div>
+              {{ plat.nom }} - {{ plat.prix }} €
+              <button class="btn btn-sm btn-primary" @click="ajouterPlat(plat)">Commander</button>
+            </li>
+          </ul>
+
+          <div class="recap">
+            <h5>Commande actuelle :</h5>
+            <ul>
+              <li v-for="(item, index) in commandesParTable[selectedTable]" :key="index">
+                {{ item.nom }} - {{ item.prix }} €
+              </li>
+            </ul>
+            <p><strong>Total :</strong> {{ commandesParTable[selectedTable].reduce((acc, p) => acc + p.prix, 0) }} €</p>
+            <button class="btn btn-sm btn-secondary" @click="showPlats = false">Fermer</button>
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
-
-
   
   <script setup>
 
@@ -114,7 +127,6 @@
   </script>
   
   <style scoped>
-
 .table-container {
   position: relative;
   width: 120px;
@@ -124,35 +136,42 @@
 .table {
   width: 100%;
   height: 100%;
+  background-color: #f8f9fa;
+  border: 2px solid #333;
+  position: relative;
+  text-align: center;
+  line-height: 120px;
+  font-weight: bold;
+  font-size: 20px;
+  cursor: pointer;
 }
 
-.rectangle {
-  border-radius: 10px;
-}
-
-.rond {
+.round {
   border-radius: 50%;
 }
 
-.chair {
+.square {
+  border-radius: 8px;
+}
+
+.rectangle {
+  width: 160px;
+  height: 100px;
+  border-radius: 8px;
+}
+
+.seat {
   width: 18px;
   height: 18px;
   background-color: #374151;
   border-radius: 50%;
   position: absolute;
-  z-index: 10;
 }
 
 .top-chair {
   top: -10px;
   left: 50%;
   transform: translateX(-50%);
-}
-
-.right-chair {
-  top: 50%;
-  right: -10px;
-  transform: translateY(-50%);
 }
 
 .bottom-chair {
@@ -162,9 +181,24 @@
 }
 
 .left-chair {
-  top: 50%;
   left: -10px;
+  top: 50%;
   transform: translateY(-50%);
+}
+
+.right-chair {
+  right: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Optionnel : style de décoration */
+.plant, .door, .window {
+  /* Placeholder style */
+  width: 40px;
+  height: 40px;
+  background-color: green;
+  margin: 5px;
 }
 
   </style>
