@@ -1,5 +1,6 @@
 <template>
     <div class="container">
+        <h1>CHEZ SISSI</h1>
     <div class="restaurant">
         <!-- 2 Tables Carrées de 4 Places -->
         <div class="table round" onclick="redirectToOrder(1)">1
@@ -71,14 +72,14 @@
         <div class="commandes" v-if="commands">
             <h1>Commandes:</h1>
             <ul>
-                <li>Table 1 : 0</li>
-                <li>Table 2 : 0</li>
-                <li>Table 3 : 0</li>
-                <li>Table 4 : 0</li>
-                <li>Table 5 : 0</li>
-                <li>Table 6 : 0</li>
-                <li>Table 7 : 0</li>
-                <li style="borderTop:1px solid black;">Total: 0</li>
+                <li><h3>Table 1 : 0</h3></li>
+                <li><h3>Table 2 : 0</h3></li>
+                <li><h3>Table 3 : 0</h3></li>
+                <li><h3>Table 4 : 0</h3></li>
+                <li><h3>Table 5 : 0</h3></li>
+                <li><h3>Table 6 : 0</h3></li>
+                <li><h3>Table 7 : 0</h3></li>
+                <li style="borderTop:1px solid black;"><h2>Total: 0</h2></li>
             </ul>
         </div>
     </div>
@@ -93,6 +94,10 @@
     function showCommands () {
         (commands.value == true) ?  commands.value = false :  commands.value = true;
     } 
+
+    function redirectToOrder() {
+
+    }
     
 </script>
 
@@ -160,6 +165,7 @@
     bottom: -80px;
     left: 50%;
     transform: translateX(-50%);
+    cursor: 
 }
 
 /* Porte */
