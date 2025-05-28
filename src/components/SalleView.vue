@@ -7,31 +7,41 @@
 
       <div class="col-md-2">
         <div v-if="listCommands" class="border rounded p-3 mb-3 bg-light">
-          <h3>Commandes</h3>
-          <ul class="list-unstyled">
-            <li v-for="table in tables" :key="table">
-                Table {{ table }} : 
-                {{ getTotal(commandesParTable[table]) }} ariary
-            </li>
-            <hr />
-            <li><strong>Total : {{ getTotalAllCommands() }} Ariary</strong></li>
+          <h3>Commandes :</h3>
+              <ul class="list-unstyled">
+                <li v-for="table in tables" :key="table">
+                    Table {{ table }} : 
+                    {{ getTotal(commandesParTable[table]) }} ariary
+                </li>
+                <hr />
+                <li><strong>Total : {{ getTotalAllCommands() }} Ariary</strong></li>
           </ul>
         </div>
 
         <div v-if="showPlats" class="menu p-3 bg-white border rounded">
-          <h5>Table {{ selectedTable }} - Commande :</h5>
-          <hr />    
-          <div class="recap">
-            <ul>
-              <li v-for="(item, index) in commandesParTable[selectedTable]" :key="index">
-                {{ item.nom }} - {{ item.prix }} Ariary
-              </li>
-            </ul>
-            <hr />
-            <p class=""><strong>Total :</strong> {{ commandesParTable[selectedTable].reduce((acc, p) => acc + p.prix, 0) }} Ariary</p>
-          </div>
-
-        </div>
+         
+            <div v-if="commandesParTable[selectedTable].length === 0">
+                 <!-- Si aucune commande -->
+              <h5>Table {{ selectedTable }} :</h5>
+              <p>Aucune commande pour cette table.</p>
+              <button @click="reserver">Réserver</button>
+            </div>
+            <div v-else>
+                 <h5>Table {{ selectedTable }} - Commande :</h5>
+              <hr />    
+              <div class="recap">
+                <ul>
+                  <li v-for="(item, index) in commandesParTable[selectedTable]" :key="index">
+                    {{ item.nom }} - {{ item.prix }} Ariary
+                  </li>
+                </ul>
+                <hr />
+                <p class=""><strong>Total :</strong> {{ commandesParTable[selectedTable].reduce((acc, p) => acc + p.prix, 0) }} Ariary</p>
+              </div>
+              </div>
+            </div>
+             
+            
 
         </div>
 
@@ -121,9 +131,9 @@ const listCommands = ref(true)
 const commands = ref({});
 const tables = [1, 2, 3, 4, 5, 6, 7, 8] 
 
-const selectedCategorie = ref('tous')
+const selectedCategorie = ref('menu')
 
-const categories = ['tous', 'plat', 'pizza', 'boisson', 'dessert', 'divers']
+const categories = ['menu', 'entree','plat', 'pizza', 'boisson', 'dessert', 'divers','tous']
 
 
 const reservations = ref([1, 3, 5]) // Exemples de tables réservées
@@ -155,7 +165,21 @@ const menu = ref([
   { id: 13, nom: "Tarte coco", prix: 2500, categorie: "dessert" },
   { id: 14, nom: "Jus de mangue", prix: 5000, categorie: "boisson" },
   { id: 15, nom: "Coca-Cola", prix: 7000, categorie: "boisson" },
-  { id: 16, nom: "Pizza 4 fromages", prix: 27000, categorie: "pizza" },
+  { id: 16, nom: "Rillettes de thon maison", prix: 27000, categorie: "entree" },
+  { id: 17, nom: "Salade César", prix: 27000, categorie: "menu" },
+  { id: 18, nom: "Carpaccio de bœuf ou de saumon", prix: 27000, categorie: "menu" },
+  { id: 19, nom: "Canard au poivre vert", prix: 27000, categorie: "menu" },
+  { id: 20, nom: "Glace au mirtille", prix: 27000, categorie: "menu" },
+  { id: 21, nom: "Banane flambée", prix: 27000, categorie: "dessert" },
+  { id: 22, nom: "Jus de corossol", prix: 27000, categorie: "menu" },
+  { id: 23, nom: "Jus panaché", prix: 27000, categorie: "boisson" },
+  { id: 24, nom: "Pizza 4 fromages", prix: 27000, categorie: "pizza" },
+  { id: 25, nom: "Tomates mozzarella (Caprese)", prix: 27000, categorie: "entree" },
+  { id: 26, nom: "Tartare de saumon à l’avocat", prix: 27000, categorie: "entree" },
+  { id: 27, nom: "Taboulé libanais", prix: 27000, categorie: "entree" },
+  { id: 28, nom: "Verrine de crevettes et guacamole", prix: 27000, categorie: "entree" },
+  { id: 29, nom: "Chèvre chaud sur toast", prix: 27000, categorie: "entree" },
+
 ])
 
 const grid = [
@@ -208,12 +232,18 @@ function getTotalAllCommands() {
 }
 
 function ajouterPlat(plat) {
+
+  if (!selectedTable.value) {
+    alert('Veuillez sélectionner une table avant de réserver.')
+    return
+  }
   commandesParTable.value[selectedTable.value].push(plat)
 }
 
 function handleClick(cell) {
   if (cell.type === 'comptoir') {
     showCommands()
+    selectedTable.value = null
   } else {
     redirectToOrder(cell.label)
   }
